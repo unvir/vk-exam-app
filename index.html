@@ -14,17 +14,43 @@
 </head>
 <body>
 <div class="header">
-    <h2 class="header-title">Экзамен по установке приложения</h2>
-    <p class="progress">Вопрос <b>1</b> из <b>1</b></p>
+    <h2 class="header-title" id="txt-header-title">Экзамен: установка приложения</h2>
+    <p class="progress" id="txt-progress-title">Вопрос <b>1</b> из <b>1</b></p>
 </div>
-<div id="exam">
-    <div class="question">
+<section class="content" id="page-install" style="display: none;">
+    <div class="question" id="question-install">
         <h3 class="question-title">Установить приложение в сообщество?</h3>
         <ul class="question-choice">
-            <li><label for="answer-1"><input type="radio" id="answer-1" name="question-1"> Да</label></li>
-            <li><label for="answer-2"><input type="radio" id="answer-2" name="question-1"> Нет</label></li>
+            <li>
+                <label for="btn-show-install-page">
+                    <input type="radio" id="btn-show-install-page" name="question-install"> Да
+                </label>
+            </li>
+            <li>
+                <label for="answer-2">
+                    <input type="radio" id="answer-2" name="question-install"> Нет
+                </label>
+            </li>
         </ul>
     </div>
-</div>
+</section>
+<section class="content" id="page-choose=exam" style="display: none;">
+    <ul>
+        <li>
+            <a id="btn-math-exam" class="btn" href="#">Тест по математике</a>
+        </li>
+        <li>
+            <a id="btn-mem-exam" class="btn" href="#">Тест на знание мемов</a>
+        </li>
+    </ul>
+</section>
+<section id="page-exam" class="content" style="display: none;">
+</section>
+<a href="#" id="btn-question-submit" class="btn btn-question btn-vk-ui" style="display: none;">Отправить</a>
 </body>
+
+<script src="https://vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
+<script src="app/page.js" type="text/javascript" defer></script>
+<script src="app.js" type="text/javascript" defer></script>
+
 </html>

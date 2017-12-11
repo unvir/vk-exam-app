@@ -52,8 +52,9 @@ label:hover {
     color: #f1f1f1;
 }
 
-#exam {
+.content {
     padding: 5px 25px;
+    margin-bottom: 15px;
     text-align: center;
 }
 
@@ -63,4 +64,48 @@ label:hover {
 
 .question-choice {
     text-align: left;
+}
+
+.btn:active, .btn:hover {
+    background-color: #f1f1f1;
+}
+
+.btn {
+    padding: 7px 15px;
+    height: 30px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 16px;
+}
+
+.btn-vk-ui:active, .btn-vk-ui:hover {
+    background-color: #688bb0;
+}
+
+.btn-vk-ui {
+    letter-spacing: 0.1px;
+    color: #fff;
+    background: #5e81a8;
+    border-radius: 2px;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, "Open Sans", "Helvetica Neue", sans-serif;
+    font-weight: 100;
+    font-size: 0.8125em;
+}
+
+.btn-negative:active, .btn-negative:hover{
+    background-color: #aaaaaa;
+}
+
+.btn-negative{
+    cursor: not-allowed;
+    background-color: #aaaaaa;
+}
+
+.btn-question {
+    position: absolute;
+}
+
+#btn-question-submit {
+    right: 25px;
 }
