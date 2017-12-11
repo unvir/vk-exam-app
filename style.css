@@ -1,0 +1,66 @@
+body {
+    padding: 0;
+    margin: 0;
+    background-color: #eaeaea;
+    color: #5c5c5c;
+    font-size: 16px;
+    font-weight: 300;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Open Sans', sans-serif;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+b {
+    font-weight: 500;
+}
+
+h2 {
+    font-weight: 500;
+}
+
+h3 {
+    margin: 1em 0;
+}
+
+a {
+    text-decoration: none;
+    outline: none;
+    color: #5e81a8;
+}
+
+label {
+    display: block;
+    width: 100%;
+    padding: 5px 3px;
+}
+
+label:hover {
+    background-color: #f1f1f1;
+}
+
+.header {
+    min-height: 50px;
+    padding: 5px 25px;
+    background-color: #688bb0;
+    color: #d9e2ec;
+}
+
+.header-title {
+    color: #f1f1f1;
+}
+
+#exam {
+    padding: 5px 25px;
+    text-align: center;
+}
+
+.question-title {
+    color: #333;
+}
+
+.question-choice {
+    text-align: left;
+}
