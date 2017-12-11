@@ -6,7 +6,7 @@ var app = {
             INSTALL_APP: document.getElementById('btn-show-install-page'),
             BACK_QUESTION: document.getElementById('btn-question-back'),
             SUBMIT_QUESTION: document.getElementById('btn-question-submit'),
-            MATH_EXAM: document.getElementById('btn-math-test'),
+            MATH_EXAM: document.getElementById('btn-math-exam'),
             MEM_EXAM: document.getElementById('btn-mem-exam')
         },
         TITLE: {
@@ -53,9 +53,9 @@ var app = {
         app.ELEMENTS.BTN.INSTALL_APP.addEventListener('click', app.showInstallPage);
 
         app.ELEMENTS.BTN.MATH_EXAM.exam = mathExam;
-        app.ELEMENTS.BTN.MATH_EXAM.addEventListener('click', startExamListener);
+        app.ELEMENTS.BTN.MATH_EXAM.addEventListener('click', app.startExamListener);
         app.ELEMENTS.BTN.MEM_EXAM.exam = memExam;
-        app.ELEMENTS.BTN.MEM_EXAM.addEventListener('click', startExamListener);
+        app.ELEMENTS.BTN.MEM_EXAM.addEventListener('click', app.startExamListener);
 
         if (app.groupId == 0) {
             app.PAGES.INSTALL.show();

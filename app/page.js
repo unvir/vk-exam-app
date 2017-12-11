@@ -19,7 +19,7 @@ Page.prototype.show = function () {
 };
 
 Page.prototype.hide = function () {
-    elem.style.display = 'none';
+    this.elem.style.display = 'none';
 };
 
 function ExamPage(domId) {
@@ -39,10 +39,10 @@ ExamPage.prototype.show = function (exam) {
     Page.prototype.show.call(this);
 
     document.getElementById('btn-question-submit').style.display = 'inline-block';
-    document.getElementById('txt-progress-title').style.display = 'inline';
+    document.getElementById('txt-exam-progress-title').style.display = 'inline';
 
     if (!exam) {
-        throw new Error('To show exampage need to call this function with exam argument');
+        throw new Error('To show exam page need to call this function with exam argument');
     }
     this.startExam(exam);
 };
@@ -51,5 +51,5 @@ ExamPage.prototype.hide = function () {
     Page.prototype.hide.call(this);
 
     document.getElementById('btn-question-submit').style.display = 'none';
-    document.getElementById('txt-progress-title').style.display = 'none';
+    document.getElementById('txt-exam-progress-title').style.display = 'none';
 };
