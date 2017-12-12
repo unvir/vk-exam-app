@@ -4,19 +4,20 @@ var app = {
     ELEMENTS: {
         BTN: {
             INSTALL_APP: document.getElementById('btn-show-install-page'),
+            SHOW_EXAMLIST: document.getElementById('btn-show-examlist'),
             BACK_QUESTION: document.getElementById('btn-question-back'),
             SUBMIT_QUESTION: document.getElementById('btn-question-submit'),
-            MATH_EXAM: document.getElementById('btn-math-exam'),
-            MEM_EXAM: document.getElementById('btn-mem-exam')
+            MATH_EXAM: document.getElementById('btn-exam-math'),
+            MEM_EXAM: document.getElementById('btn-exam-mem')
         },
         TITLE: {
-            HEADER_TITLE: document.getElementById('txt-header-title'),
-            EXAM_PROGRESS_TITLE: document.getElementById('txt-exam-progress-title')
+            HEADER_TITLE: document.getElementById('txt-title-header'),
+            EXAM_PROGRESS_TITLE: document.getElementById('txt-title-exam-progress')
         }
     },
     PAGES: {
         INSTALL: new Page('page-install'),
-        CHOOSE_EXAM: new Page('page-choose=exam'),
+        CHOOSE_EXAM: new Page('page-choose-exam'),
         EXAM: new ExamPage('page-exam')
     },
 
@@ -46,7 +47,6 @@ var app = {
         app.appId = app.getUrlParameter('api_id');
         app.groupId = app.getUrlParameter('group_id');
 
-
         VK.init(null, null, app.API_VERSION);
 
         sessionStorage.setItem('viewerId', app.getUrlParameter('viewer_id'));
@@ -56,16 +56,21 @@ var app = {
         app.ELEMENTS.BTN.MATH_EXAM.addEventListener('click', app.startExamListener);
         app.ELEMENTS.BTN.MEM_EXAM.exam = memExam;
         app.ELEMENTS.BTN.MEM_EXAM.addEventListener('click', app.startExamListener);
+        app.ELEMENTS.BTN.SHOW_EXAMLIST.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.target.style.display = 'none';
+            app.PAGES.CHOOSE_EXAM.show();
+        });
 
         if (app.groupId == 0) {
             app.PAGES.INSTALL.show();
+            app.ELEMENTS.TITLE.EXAM_PROGRESS_TITLE.style.display = 'block';
         } else {
             app.PAGES.CHOOSE_EXAM.show();
             app.ELEMENTS.TITLE.EXAM_PROGRESS_TITLE.style.display = 'none';
         }
     }
 };
-
 
 window.addEventListener('load', function () {
     app.init();

@@ -93,11 +93,11 @@ label:hover {
     font-size: 0.8125em;
 }
 
-.btn-negative:active, .btn-negative:hover{
+.btn-negative:active, .btn-negative:hover {
     background-color: #aaaaaa;
 }
 
-.btn-negative{
+.btn-negative {
     cursor: not-allowed;
     background-color: #aaaaaa;
 }
@@ -106,6 +106,6 @@ label:hover {
     position: absolute;
 }
 
-#btn-question-submit {
+#btn-question-submit, #btn-show-examlist {
     right: 25px;
 }
