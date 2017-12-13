@@ -1,11 +1,12 @@
 body {
     padding: 0;
     margin: 0;
-    background-color: #eaeaea;
+    background-color: #f8f8f8;
     color: #5c5c5c;
     font-size: 16px;
     font-weight: 300;
     font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Open Sans', sans-serif;
+    -webkit-font-smoothing: subpixel-antialiased;
 }
 
 ul {
@@ -29,6 +30,10 @@ a {
     text-decoration: none;
     outline: none;
     color: #5e81a8;
+}
+
+input[type=radio] {
+    margin: auto 5px;
 }
 
 label {
@@ -106,6 +111,6 @@ label:hover {
     position: absolute;
 }
 
-#btn-question-submit, #btn-show-examlist {
+#btn-question-submit {
     right: 25px;
 }

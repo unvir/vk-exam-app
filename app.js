@@ -2,36 +2,33 @@ var app = {
     API_VERSION: '5.69',
     VIEWER_DEVICE_MOBILE: 'mobile',
     ELEMENTS: {
-        BTN: {
-            INSTALL_APP: document.getElementById('btn-show-install-page'),
-            SHOW_EXAMLIST: document.getElementById('btn-show-examlist'),
-            BACK_QUESTION: document.getElementById('btn-question-back'),
-            SUBMIT_QUESTION: document.getElementById('btn-question-submit'),
-            MATH_EXAM: document.getElementById('btn-exam-math'),
-            MEM_EXAM: document.getElementById('btn-exam-mem')
-        },
-        TITLE: {
-            HEADER_TITLE: document.getElementById('txt-title-header'),
-            EXAM_PROGRESS_TITLE: document.getElementById('txt-title-exam-progress')
-        }
+        INSTALL_APP_BUTTON: document.getElementById('btn-show-install-page'),
+        SUBMIT_QUESTION_BUTTON: document.getElementById('btn-question-submit'),
+        HEADER_TITLE: document.getElementById('txt-title-header'),
+        EXAM_PROGRESS_TITLE: document.getElementById('txt-title-exam-progress')
     },
     PAGES: {
-        INSTALL: new Page('page-install'),
-        CHOOSE_EXAM: new Page('page-choose-exam'),
-        EXAM: new ExamPage('page-exam')
+        INSTALL: document.getElementById('page-install'),
+        EXAM: document.getElementById('page-exam')
     },
 
     appId: 0,
     groupId: 0,
 
+    show: function (page) {
+        page.style.display = 'block';
+
+        if (page === app.PAGES.EXAM){
+            app.PAGES.INSTALL.style.display = 'none';
+            app.startExam(page.item);
+        } else {
+            app.PAGES.EXAM.style.display = 'none';
+        }
+    },
+
     showInstallPage: function (event) {
         event.preventDefault();
         window.open('https://vk.com/add_community_app.php?aid=' + app.appId, '_blank');
-    },
-
-    startExamListener: function (event) {
-        event.preventDefault();
-        app.PAGES.EXAM.show(event.target.exam);
     },
 
     getUrlParameter: function (name) {
@@ -43,32 +40,123 @@ var app = {
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     },
 
+    /*EXAM*/
+    examStatus: {
+        self: null,
+        questionNumber: 0,
+        maxQuestion: 0,
+        userAnswers: []
+    },
+
+    btnSubmitHandlers: {
+        nextQuestionEvent: function (event) {
+            event.preventDefault();
+            // TODO: get user answers this.examStatus.userAnswers
+            app.nextQuestion(app.examStatus.self);
+        }.bind(app),
+        submitExamEvent: function (event) {
+            event.preventDefault();
+            app.showResults();
+        }.bind(app)
+    },
+
+    startExam: function startExam(exam) {
+        app.examStatus.maxQuestion = exam.questions.length;
+        app.examStatus.questionNumber = 0;
+        app.examStatus.self = exam;
+        app.examStatus.userAnswers = [];
+
+        app.ELEMENTS.HEADER_TITLE.innerHTML = 'Экзамен: ' + exam.title;
+        app.ELEMENTS.SUBMIT_QUESTION_BUTTON.style.display = 'inline-block';
+        app.ELEMENTS.SUBMIT_QUESTION_BUTTON.innerHTML = 'Далее';
+
+        app.ELEMENTS.SUBMIT_QUESTION_BUTTON.addEventListener('click', app.btnSubmitHandlers.nextQuestionEvent);
+
+        app.nextQuestion(exam);
+    },
+
+    nextQuestion: function (exam) {
+        app.PAGES.EXAM.innerHTML = '';
+        app.PAGES.EXAM.appendChild(
+            app.renderQuestion(exam.questions[app.examStatus.questionNumber])
+        );
+
+        app.examStatus.questionNumber++;
+
+        if (app.examStatus.questionNumber === app.examStatus.maxQuestion) {
+            var btnSubmit = app.ELEMENTS.SUBMIT_QUESTION_BUTTON;
+            btnSubmit.innerHTML = 'Отправить';
+            btnSubmit.removeEventListener('click', app.btnSubmitHandlers.nextQuestionEvent);
+            btnSubmit.addEventListener('click', app.btnSubmitHandlers.submitExamEvent);
+        }
+        app.updateCounters();
+    },
+
+    showResults: function () {
+        app.PAGES.EXAM.innerHTML = '';
+        // TODO: Generate results page
+        app.ELEMENTS.SUBMIT_QUESTION_BUTTON.removeEventListener('click', app.btnSubmitHandlers.submitExamEvent);
+        app.ELEMENTS.SUBMIT_QUESTION_BUTTON.style.display = 'none';
+        app.ELEMENTS.EXAM_PROGRESS_TITLE.style.display = 'none';
+    },
+
+    updateCounters: function () {
+        app.ELEMENTS.EXAM_PROGRESS_TITLE.innerHTML = 'Вопрос <b>'
+            + app.examStatus.questionNumber + '</b> из <b>' + app.examStatus.maxQuestion + '</b>'
+    },
+
+    renderQuestion: function (question) {
+        var mainContainerElem = document.createElement('div');
+        mainContainerElem.classList.add('question');
+        mainContainerElem.id = 'question-' + question.id;
+
+        var questionTitleElem = document.createElement('h3');
+        questionTitleElem.classList.add('question-title');
+        questionTitleElem.innerHTML = question.title;
+
+        var choiceListElem = document.createElement('ul');
+        choiceListElem.classList.add('question-choice');
+
+        question.answers.forEach(function (answer, i) {
+            var choiceListItemElem = document.createElement('li');
+
+            var choiceLabelElem = document.createElement('label');
+            choiceLabelElem.for = 'answer-' + i;
+
+            var choiceInputElem = document.createElement('input');
+            choiceInputElem.type = 'radio';
+            choiceInputElem.id = 'answer-' + i;
+            choiceInputElem.name = 'question-' + question.id;
+
+            var choiceTextNode = document.createTextNode(answer.value);
+
+            choiceLabelElem.appendChild(choiceInputElem);
+            choiceLabelElem.appendChild(choiceTextNode);
+            choiceListItemElem.appendChild(choiceLabelElem);
+            choiceListElem.appendChild(choiceListItemElem);
+        });
+
+        mainContainerElem.appendChild(questionTitleElem);
+        mainContainerElem.appendChild(choiceListElem);
+
+        return mainContainerElem;
+    },
+
     init: function () {
         app.appId = app.getUrlParameter('api_id');
         app.groupId = app.getUrlParameter('group_id');
 
-        VK.init(null, null, app.API_VERSION);
+        //VK.init(null, null, app.API_VERSION);
 
         sessionStorage.setItem('viewerId', app.getUrlParameter('viewer_id'));
-        app.ELEMENTS.BTN.INSTALL_APP.addEventListener('click', app.showInstallPage);
+        app.ELEMENTS.INSTALL_APP_BUTTON.addEventListener('click', app.showInstallPage);
+        app.PAGES.EXAM.item = mathExam;
 
-        app.ELEMENTS.BTN.MATH_EXAM.exam = mathExam;
-        app.ELEMENTS.BTN.MATH_EXAM.addEventListener('click', app.startExamListener);
-        app.ELEMENTS.BTN.MEM_EXAM.exam = memExam;
-        app.ELEMENTS.BTN.MEM_EXAM.addEventListener('click', app.startExamListener);
-        app.ELEMENTS.BTN.SHOW_EXAMLIST.addEventListener('click', function (event) {
-            event.preventDefault();
-            event.target.style.display = 'none';
-            app.PAGES.CHOOSE_EXAM.show();
-        });
-
-        if (app.groupId == 0) {
-            app.PAGES.INSTALL.show();
-            app.ELEMENTS.TITLE.EXAM_PROGRESS_TITLE.style.display = 'block';
-        } else {
-            app.PAGES.CHOOSE_EXAM.show();
-            app.ELEMENTS.TITLE.EXAM_PROGRESS_TITLE.style.display = 'none';
-        }
+        /*if (app.groupId == 0) {
+            app.show(app.PAGES.INSTALL);
+        } else {*/
+            app.show(app.PAGES.EXAM);
+        //}
     }
 };
 
@@ -130,59 +218,6 @@ var mathExam = {
                 },
                 {
                     value: "Взять производную от 2x и выбросить ее",
-                    isTrueAnswer: false
-                }
-            ]
-        }
-    ]
-};
-
-var memExam = {
-    title: "На знание мемов",
-    countToSolve: 1,
-    questions: [
-        {
-            id: 1,
-            title: "Знаете, кто придумал мемы?",
-            answers: [
-                {
-                    value: "Да",
-                    isTrueAnswer: true
-                },
-                {
-                    value: "Нет",
-                    isTrueAnswer: false
-                }
-            ]
-        },
-        {
-            id: 2,
-            title: "Знаете, как выглядит мем 'Poker face'?",
-            answers: [
-                {
-                    value: "Да",
-                    isTrueAnswer: true
-                },
-                {
-                    value: "Нет",
-                    isTrueAnswer: false
-                }
-            ]
-        },
-        {
-            id: 3,
-            title: "Мемы с котами классные?",
-            answers: [
-                {
-                    value: "Да",
-                    isTrueAnswer: true
-                },
-                {
-                    value: "Нет",
-                    isTrueAnswer: false
-                },
-                {
-                    value: "Не знаю",
                     isTrueAnswer: false
                 }
             ]
