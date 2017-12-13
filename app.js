@@ -4,43 +4,22 @@ var app = {
     ELEMENTS: {
         INSTALL_APP_BUTTON: document.getElementById('btn-show-install-page'),
         SUBMIT_QUESTION_BUTTON: document.getElementById('btn-question-submit'),
+        TRY_AGAIN_BUTTON: document.getElementById('btn-try-again'),
+        SHARE_BUTTON: document.getElementById('btn-share'),
         HEADER_TITLE: document.getElementById('txt-title-header'),
-        EXAM_PROGRESS_TITLE: document.getElementById('txt-title-exam-progress')
+        EXAM_PROGRESS_TITLE: document.getElementById('txt-title-exam-progress'),
+        RESULT_SCORES: document.getElementById('txt-score'),
+        RESULT_MAX_SCORES: document.getElementById('txt-max-score')
     },
     PAGES: {
         INSTALL: document.getElementById('page-install'),
-        EXAM: document.getElementById('page-exam')
+        EXAM: document.getElementById('page-exam'),
+        RESULT: document.getElementById('page-results')
     },
 
     appId: 0,
     groupId: 0,
 
-    show: function (page) {
-        page.style.display = 'block';
-
-        if (page === app.PAGES.EXAM){
-            app.PAGES.INSTALL.style.display = 'none';
-            app.startExam(page.item);
-        } else {
-            app.PAGES.EXAM.style.display = 'none';
-        }
-    },
-
-    showInstallPage: function (event) {
-        event.preventDefault();
-        window.open('https://vk.com/add_community_app.php?aid=' + app.appId, '_blank');
-    },
-
-    getUrlParameter: function (name) {
-        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-
-        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-        var results = regex.exec(location.search);
-
-        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-    },
-
-    /*EXAM*/
     examStatus: {
         self: null,
         questionNumber: 0,
@@ -51,13 +30,20 @@ var app = {
     btnSubmitHandlers: {
         nextQuestionEvent: function (event) {
             event.preventDefault();
-            // TODO: get user answers this.examStatus.userAnswers
             app.nextQuestion(app.examStatus.self);
-        }.bind(app),
+        },
         submitExamEvent: function (event) {
             event.preventDefault();
             app.showResults();
-        }.bind(app)
+        },
+        countScore: function (event) {
+            event.preventDefault();
+
+            var answer = document.querySelector('input[type=radio]:checked');
+            app.examStatus.userAnswers.push(
+                answer == null ? null : answer.item
+            );
+        }
     },
 
     startExam: function startExam(exam) {
@@ -70,6 +56,7 @@ var app = {
         app.ELEMENTS.SUBMIT_QUESTION_BUTTON.style.display = 'inline-block';
         app.ELEMENTS.SUBMIT_QUESTION_BUTTON.innerHTML = 'Далее';
 
+        app.ELEMENTS.SUBMIT_QUESTION_BUTTON.addEventListener('click', app.btnSubmitHandlers.countScore);
         app.ELEMENTS.SUBMIT_QUESTION_BUTTON.addEventListener('click', app.btnSubmitHandlers.nextQuestionEvent);
 
         app.nextQuestion(exam);
@@ -93,11 +80,72 @@ var app = {
     },
 
     showResults: function () {
-        app.PAGES.EXAM.innerHTML = '';
-        // TODO: Generate results page
+        var userResult = 0;
+
+        app.examStatus.self.questions.forEach(function (question) {
+
+            if (question.correctAnswerId === app.examStatus.userAnswers.shift().id){
+                userResult++;
+            }
+        });
+
+        sessionStorage.setItem('testResult', userResult);
+        app.ELEMENTS.RESULT_SCORES.innerHTML = userResult;
+        app.ELEMENTS.RESULT_MAX_SCORES.innerHTML =  app.examStatus.maxQuestion;
+
         app.ELEMENTS.SUBMIT_QUESTION_BUTTON.removeEventListener('click', app.btnSubmitHandlers.submitExamEvent);
-        app.ELEMENTS.SUBMIT_QUESTION_BUTTON.style.display = 'none';
-        app.ELEMENTS.EXAM_PROGRESS_TITLE.style.display = 'none';
+        app.ELEMENTS.SUBMIT_QUESTION_BUTTON.removeEventListener('click', app.btnSubmitHandlers.countScore);
+
+        app.show(app.PAGES.RESULT);
+    },
+
+    show: function (page) {
+        app.hideAll();
+        page.style.display = 'block';
+
+        switch (page){
+            case app.PAGES.INSTALL:
+                app.ELEMENTS.EXAM_PROGRESS_TITLE.innerHTML = 'Вопрос <b>1</b> из <b>1</b>';
+                app.ELEMENTS.SUBMIT_QUESTION_BUTTON.style.display = 'inline-block';
+                break;
+
+            case app.PAGES.EXAM:
+                app.startExam(page.item);
+                app.ELEMENTS.EXAM_PROGRESS_TITLE.style.display = 'inline-block';
+                app.ELEMENTS.SUBMIT_QUESTION_BUTTON.style.display = 'inline-block';
+                break;
+
+            case app.PAGES.RESULT:
+                app.ELEMENTS.SUBMIT_QUESTION_BUTTON.style.display = 'none';
+                app.ELEMENTS.EXAM_PROGRESS_TITLE.style.display = 'none';
+                break;
+        }
+
+        if (page === app.PAGES.EXAM){
+
+        } else if (page === app.PAGES.INSTALL) {
+
+        }
+    },
+
+    hideAll: function () {
+        for(var page in app.PAGES){
+            app.PAGES[page].style.display = 'none';
+        }
+    },
+
+    showInstallPage: function (event) {
+        event.preventDefault();
+        window.open('https://vk.com/add_community_app.php?aid=' + app.appId, '_blank');
+    },
+
+    getUrlParameter: function (name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     },
 
     updateCounters: function () {
@@ -127,6 +175,7 @@ var app = {
             choiceInputElem.type = 'radio';
             choiceInputElem.id = 'answer-' + i;
             choiceInputElem.name = 'question-' + question.id;
+            choiceInputElem.item = answer;
 
             var choiceTextNode = document.createTextNode(answer.value);
 
@@ -146,17 +195,50 @@ var app = {
         app.appId = app.getUrlParameter('api_id');
         app.groupId = app.getUrlParameter('group_id');
 
-        //VK.init(null, null, app.API_VERSION);
+        VK.init(null, null, app.API_VERSION);
 
         sessionStorage.setItem('viewerId', app.getUrlParameter('viewer_id'));
         app.ELEMENTS.INSTALL_APP_BUTTON.addEventListener('click', app.showInstallPage);
+        app.ELEMENTS.TRY_AGAIN_BUTTON.addEventListener('click', function (event) {
+            event.preventDefault();
+            app.show(app.PAGES.EXAM);
+        });
+
+        app.ELEMENTS.SHARE_BUTTON.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            var viewerDevice = app.getUrlParameter('viewer_device');
+            var resultImages = [
+                '0-3.png',
+                '1-3.png',
+                '2-3.png',
+                '3-3.png'
+            ];
+            var imageUrl = location.href + '/images/' + resultImages[sessionStorage.getItem('testResult')];
+
+            if (viewerDevice && viewerDevice === app.VIEWER_DEVICE_MOBILE) {
+                VK.callMethod('shareBox',
+                    'https://vk.com/app' + app.appId,
+                    imageUrl,
+                    '');
+            } else {
+                var appLink = 'https://vk.com/app' + app.appId + '_-' + app.groupId;
+
+                var requestData = {
+                    'owner_id': sessionStorage.getItem('viewerId'),
+                    'attachments': imageUrl + ',' + appLink
+                };
+
+                VK.api('wall.post', requestData);
+            }
+        });
         app.PAGES.EXAM.item = mathExam;
 
-        /*if (app.groupId == 0) {
+        if (app.groupId == 0) {
             app.show(app.PAGES.INSTALL);
-        } else {*/
+        } else {
             app.show(app.PAGES.EXAM);
-        //}
+        }
     }
 };
 
@@ -166,59 +248,61 @@ window.addEventListener('load', function () {
 
 var mathExam = {
     title: "Математика",
-    countToSolve: 3,
     questions: [
         {
             id: 1,
             title: "Сколько будет 2х2?",
+            correctAnswerId: 1,
             answers: [
                 {
-                    value: "4",
-                    isTrueAnswer: true
+                    id: 1,
+                    value: "4"
                 },
                 {
-                    value: "Кот",
-                    isTrueAnswer: false
+                    id: 2,
+                    value: "Кот"
                 }
             ]
         },
         {
             id: 2,
             title: "Как можно найти корни квадратного уравнения?",
+            correctAnswerId: 1,
             answers: [
                 {
-                    value: "По теореме Виета",
-                    isTrueAnswer: true
+                    id: 1,
+                    value: "По теореме Виета"
                 },
                 {
-                    value: "Умножить коэффициенты уравнения",
-                    isTrueAnswer: false
+                    id: 2,
+                    value: "Умножить коэффициенты уравнения"
                 },
                 {
-                    value: "Сложить коэффициенты уравнения",
-                    isTrueAnswer: false
+                    id: 3,
+                    value: "Сложить коэффициенты уравнения"
                 }
             ]
         },
         {
             id: 3,
             title: "Каким способом можно вычислить вторую производную функции f(x)=x*x ?",
+            correctAnswerId: null,
             answers: [
                 {
-                    value: "Лечь на пол и заплакать",
-                    isTrueAnswer: false
+                    id: 1,
+                    value: "Лечь на пол и заплакать"
                 },
                 {
-                    value: "Поделить функцию на ноль",
-                    isTrueAnswer: false
+                    id: 2,
+                    value: "Поделить функцию на ноль"
                 },
                 {
-                    value: "Спросить у мудреца под куполом офиса ВКонтакте",
-                    isTrueAnswer: false
+                    id: 3,
+                    value: "Спросить у мудреца под куполом офиса ВКонтакте"
                 },
                 {
-                    value: "Взять производную от 2x и выбросить ее",
-                    isTrueAnswer: false
+                    id: 4,
+                    value: "Взять производную от 2x и выбросить ее"
                 }
             ]
         }

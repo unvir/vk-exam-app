@@ -33,13 +33,17 @@ a {
 }
 
 input[type=radio] {
-    margin: auto 5px;
+    vertical-align: middle;
+    width: 15px;
+    height: 15px;
+    margin: 0 5px;
 }
 
 label {
     display: block;
     width: 100%;
-    padding: 5px 3px;
+    padding: 7px 5px;
+    font-weight: 400;
 }
 
 label:hover {
@@ -59,7 +63,6 @@ label:hover {
 
 .content {
     padding: 5px 25px;
-    margin-bottom: 15px;
     text-align: center;
 }
 
@@ -113,4 +116,42 @@ label:hover {
 
 #btn-question-submit {
     right: 25px;
+}
+
+.wrapper-buttons-control{
+    margin: 0 0 50px 0;
+}
+
+.title{
+    font-size: 1.5em;
+}
+
+.score{
+    font-size: 3em;
+    line-height: 100px;
+}
+
+.max-score::before{
+    content: '/\a0';
+    display: inline-block;
+}
+
+.max-score{
+    display: block;
+    position: absolute;
+    bottom: 5px;
+    right: -25px;
+    color: #5c5c5c;
+}
+
+.circle{
+    width: 100px;
+    height: 100px;
+    margin: 25px auto;
+    position: relative;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    background-color: #5e81a8;
+    color: #f1f1f1;
 }
